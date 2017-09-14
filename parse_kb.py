@@ -7,6 +7,13 @@ event_arg_collector = Collector("type", "mention")
 mention_collector = Collector("provenance", "type")
 relation_arg_collector = Collector("type", "mention", "relation")
 
+"""
+1. Add relations
+2. Add NIL, and their surface form
+3. Don't add nominal
+4. Freebase to Wiki mapping, retain all string.
+"""
+
 
 def process_relation(relations, relation):
     # print("New relation: ")
@@ -19,14 +26,12 @@ def process_entity(entities, collector, s, key, value):
     ready = mention_collector.add_arg(s, key, value)
     if ready:
         entity_content = collector.pop(s)
-        # print(entity_content)
         provenance = entity_content['provenance']
         entities[s] = {"text": provenance['text'], 'provenance': provenance['provenance'],
-                       'type': entity_content['type']}
+                       'type': entity_content['type'], 'mention_category': provenance['mention_category']}
 
 
 def read_data(kb_path):
-    print("Going to read the KB.")
     count = 0
 
     kb = KbReader(kb_path)
@@ -44,7 +49,9 @@ def read_data(kb_path):
             process_entity(entities, mention_collector, content['id'], "type", content['value'])
         elif entry_type.startswith("entity_mention"):
             value = {'source': content['source'], 'provenance': content['provenance'],
-                     'entity_id': content['entity_id'], 'text': content['text']}
+                     'entity_id': content['entity_id'], 'text': content['text'],
+                     'mention_category': content['mention_category']}
+            # Ignore nominal mention here.
             process_entity(entities, mention_collector, content['id'], "provenance", value)
         elif entry_type == "relation_event_argument":
             arg2 = content['arg2']

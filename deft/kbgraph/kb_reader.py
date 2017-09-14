@@ -36,8 +36,9 @@ class KbReader:
                 return "relation_entity", \
                        {"arg1": fields[0], "arg2": fields[2], "relation": fields[1], "provenance": fields[3]}
             elif "mention" in fields[1]:
-                return "entity_mention_" + fields[1], {"id": identifier, "source": source, "type": fields[1],
-                                                       "text": fields[2], "provenance": fields[3], "entity_id": eid}
+                return "entity_mention_" + fields[1], {"id": identifier, "source": source, "text": fields[2],
+                                                       "mention_category": fields[1], "provenance": fields[3],
+                                                       "entity_id": eid}
 
         # Indicate this line is not handled.
         return None
@@ -67,7 +68,8 @@ class KbReader:
                         "event": arg_event_id}
             else:
                 return "event_argument_mention", {"id": identifier, "realis": fields[1].split(".")[1],
-                                                  "provenance": fields[3], "text": fields[2], "event": arg_event_id}
+                                                  "provenance": fields[3], "text": fields[2], "event": arg_event_id,
+                                                  "mention_category": fields[1]}
 
     def __parse_event_nugget(self, fields):
         identifier = fields[0]
@@ -83,7 +85,8 @@ class KbReader:
         elif len(fields) == 5:
             if "mention" in fields[1]:
                 return "event_nugget_" + fields[1], {"id": event_id, "realis": fields[1].split(".")[1],
-                                                     "provenance": fields[3], "text": fields[2]}
+                                                     "provenance": fields[3], "text": fields[2],
+                                                     "mention_category": fields[1]}
 
     def __parse_event_string_arg(self, fields):
         identifier = fields[0]
@@ -92,7 +95,8 @@ class KbReader:
             return "event_string_arg_property", {"id": identifier, "property": fields[1], "value": fields[2]}
         elif len(fields) == 5:
             if "mention" in fields[1]:
-                return "event_string_arg", {"id": identifier, "type": fields[1], "provenance": fields[3], "text": fields[2]}
+                return "event_string_arg", {"id": identifier, "type": fields[1], "provenance": fields[3],
+                                            "text": fields[2], "mention_category": fields[1]}
 
     def __parse_string_relation(self, fields):
         identifier = fields[0]
@@ -101,7 +105,7 @@ class KbReader:
         elif len(fields) == 5:
             if "mention" in fields[1]:
                 return "relation_arg_string", {"id": identifier, "type": fields[1], "provenance": fields[3],
-                                               "text": fields[2]}
+                                               "text": fields[2], "mention_category": fields[1]}
 
     def __parse_entry(self, entry_str):
         parts = entry_str.split("\t")
